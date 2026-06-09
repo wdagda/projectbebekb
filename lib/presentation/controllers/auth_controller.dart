@@ -32,9 +32,9 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> login(String username, String password) async {
-    if (username.isEmpty || password.isEmpty) {
-      Get.snackbar('Error', 'Username dan password tidak boleh kosong');
+  Future<void> login(String usernameOrEmail, String password) async {
+    if (usernameOrEmail.isEmpty || password.isEmpty) {
+      Get.snackbar('Error', 'Username/Email dan password tidak boleh kosong');
       return;
     }
 
@@ -45,8 +45,8 @@ class AuthController extends GetxController {
       
       final List<Map<String, dynamic>> result = await db.query(
         'User',
-        where: 'username = ? AND password_hash = ?',
-        whereArgs: [username, hashedPw],
+        where: '(username = ? OR email = ?) AND password_hash = ?',
+        whereArgs: [usernameOrEmail, usernameOrEmail, hashedPw],
       );
 
       if (result.isNotEmpty) {
@@ -57,10 +57,52 @@ class AuthController extends GetxController {
         
         Get.offAllNamed(AppRoutes.DASHBOARD);
       } else {
-        Get.snackbar('Login Gagal', 'Username atau password salah');
+        Get.snackbar('Login Gagal', 'Username/Email atau password salah');
       }
     } catch (e) {
-      Get.snackbar('Error', 'Terjadi kesalahan sistem');
+      Get.snackbar('Error', 'Terjadi kesalahan sistem: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> signup(String nama, String email, String username, String password) async {
+    if (nama.isEmpty || email.isEmpty || username.isEmpty || password.isEmpty) {
+      Get.snackbar('Error', 'Semua field harus diisi');
+      return;
+    }
+
+    isLoading.value = true;
+    try {
+      final db = await LocalDB.database;
+      
+      // Cek apakah username atau email sudah ada
+      final existingUser = await db.query(
+        'User',
+        where: 'username = ? OR email = ?',
+        whereArgs: [username, email],
+      );
+
+      if (existingUser.isNotEmpty) {
+        Get.snackbar('Gagal', 'Username atau Email sudah terdaftar');
+        return;
+      }
+
+      String hashedPw = CryptoUtils.hashPassword(password);
+      
+      await db.insert('User', {
+        'nama': nama,
+        'username': username,
+        'email': email,
+        'password_hash': hashedPw,
+        'role': 'User' // Default role
+      });
+
+      Get.snackbar('Sukses', 'Registrasi berhasil, silakan login');
+      Get.offAllNamed(AppRoutes.LOGIN);
+      
+    } catch (e) {
+      Get.snackbar('Error', 'Terjadi kesalahan sistem: $e');
     } finally {
       isLoading.value = false;
     }

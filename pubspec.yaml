@@ -39,10 +39,10 @@ dependencies:
   crypto: ^3.0.3
   local_auth: ^2.1.6
   http: ^1.1.0
-  sensors_plus: ^4.0.2
+  sensors_plus: ^7.0.0
   geolocator: ^10.1.0
   google_maps_flutter: ^2.5.0
-  flutter_local_notifications: ^16.1.0
+  flutter_local_notifications: ^22.0.0
 
 dev_dependencies:
   flutter_test:

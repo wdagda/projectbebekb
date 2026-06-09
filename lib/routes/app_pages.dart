@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'app_routes.dart';
 import '../presentation/pages/auth/login_page.dart';
+import '../presentation/pages/auth/signup_page.dart';
 import '../presentation/pages/main_page.dart';
 
 class AppPages {
@@ -12,6 +13,10 @@ class AppPages {
     GetPage(
       name: AppRoutes.DASHBOARD,
       page: () => MainPage(),
+    ),
+    GetPage(
+      name: AppRoutes.SIGNUP,
+      page: () => SignupPage(),
     ),
   ];
 }

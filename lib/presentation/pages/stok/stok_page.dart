@@ -54,11 +54,13 @@ class StokPage extends StatelessWidget {
               subtitle: Text('Tersedia: ${produk['stok']}'),
               trailing: PopupMenuButton<String>(
                 onSelected: (val) {
+                  if (val == 'tambah') _showTambahDialog(context, produk);
                   if (val == 'jual') _showJualDialog(context, produk);
                   if (val == 'konversi') _showKonversiDialog(context);
                 },
                 itemBuilder: (context) {
                   List<PopupMenuEntry<String>> items = [];
+                  items.add(const PopupMenuItem(value: 'tambah', child: Text('Tambah Stok')));
                   items.add(const PopupMenuItem(value: 'jual', child: Text('Jual / Keluar')));
                   if (produk['nama_produk'] == 'Telur Bebek Mentah') {
                     items.add(const PopupMenuItem(value: 'konversi', child: Text('Konversi Produk')));
@@ -88,6 +90,27 @@ class StokPage extends StatelessWidget {
       onConfirm: () {
         if (qtyCtrl.text.isNotEmpty) {
           controller.catatPenjualan(produk['id'], int.parse(qtyCtrl.text));
+          Get.back();
+        }
+      }
+    );
+  }
+
+  void _showTambahDialog(BuildContext context, Map produk) {
+    final qtyCtrl = TextEditingController();
+    Get.defaultDialog(
+      title: 'Tambah Stok ${produk['nama_produk']}',
+      content: TextField(
+        controller: qtyCtrl,
+        keyboardType: TextInputType.number,
+        decoration: const InputDecoration(labelText: 'Jumlah ditambahkan', border: OutlineInputBorder()),
+      ),
+      textConfirm: 'Tambah',
+      textCancel: 'Batal',
+      confirmTextColor: Colors.white,
+      onConfirm: () {
+        if (qtyCtrl.text.isNotEmpty) {
+          controller.tambahStok(produk['id'], int.parse(qtyCtrl.text));
           Get.back();
         }
       }

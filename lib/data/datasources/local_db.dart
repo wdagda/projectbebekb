@@ -28,6 +28,7 @@ class LocalDB {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nama TEXT,
         username TEXT UNIQUE,
+        email TEXT UNIQUE,
         password_hash TEXT,
         role TEXT
       )
@@ -114,6 +115,7 @@ class LocalDB {
     await db.insert('User', {
       'nama': 'Administrator',
       'username': 'admin',
+      'email': 'admin@duckfarm.com',
       'password_hash': '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', // SHA-256 for 'admin'
       'role': 'Admin'
     });

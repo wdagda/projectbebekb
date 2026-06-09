@@ -89,4 +89,29 @@ class TransaksiController extends GetxController {
     Get.back(); // tutup dialog
     Get.snackbar("Sukses", "$rawQty Telur Mentah menjadi $targetQty $targetProdukName");
   }
+
+  Future<void> tambahStok(int produkId, int jumlahTambah) async {
+    final db = await LocalDB.database;
+    
+    await db.transaction((txn) async {
+      // 1. Catat riwayat
+      await txn.insert('RiwayatTransaksi', {
+        'produk_id': produkId,
+        'tanggal': DateTime.now().toIso8601String(),
+        'jenis_transaksi': 'Penambahan',
+        'jumlah_perubahan': jumlahTambah,
+        'keterangan': 'Penambahan stok manual sejumlah $jumlahTambah'
+      });
+      
+      // 2. Tambah stok
+      await txn.rawUpdate('''
+        UPDATE Produk 
+        SET stok = stok + ? 
+        WHERE id = ?
+      ''', [jumlahTambah, produkId]);
+    });
+    
+    fetchProduk();
+    Get.snackbar("Sukses", "Stok berhasil ditambahkan");
+  }
 }
