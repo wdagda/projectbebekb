@@ -27,7 +27,7 @@ class ChatbotPage extends StatelessWidget {
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: isUser ? Colors.orange.shade100 : Colors.grey.shade200,
+                      color: isUser ? Colors.pink.shade100 : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(msg['text']!, style: const TextStyle(fontSize: 16)),
@@ -40,7 +40,7 @@ class ChatbotPage extends StatelessWidget {
             if (controller.isLoading.value) {
               return const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: LinearProgressIndicator(color: Colors.orange),
+                child: LinearProgressIndicator(color: Colors.pink),
               );
             }
             return const SizedBox.shrink();
@@ -61,7 +61,7 @@ class ChatbotPage extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 CircleAvatar(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Colors.pink,
                   radius: 24,
                   child: IconButton(
                     icon: const Icon(Icons.send, color: Colors.white),

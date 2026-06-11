@@ -5,6 +5,7 @@ import '../game/game_catch_egg_page.dart';
 import '../game/game_balance_egg_page.dart';
 import 'chatbot_page.dart';
 import 'exchange_page.dart';
+import 'edit_profile_page.dart';
 
 class ProfilPage extends StatelessWidget {
   ProfilPage({Key? key}) : super(key: key);
@@ -16,28 +17,43 @@ class ProfilPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profil Saya'),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.pink,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const CircleAvatar(
+            Obx(() => CircleAvatar(
               radius: 50,
-              backgroundColor: Colors.orangeAccent,
-              child: Icon(Icons.person, size: 60, color: Colors.white),
-            ),
+              backgroundColor: Colors.pinkAccent,
+              child: Text(
+                controller.username.value.isNotEmpty ? controller.username.value[0].toUpperCase() : '?',
+                style: const TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            )),
             const SizedBox(height: 16),
-            Obx(() => Text(
-              controller.username.value.toUpperCase(),
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Obx(() => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  controller.username.value.toUpperCase(),
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ],
             )),
             Obx(() => Text(
               controller.role.value,
               style: const TextStyle(fontSize: 16, color: Colors.grey),
             )),
             const SizedBox(height: 32),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.manage_accounts, color: Colors.blueGrey),
+              title: const Text('Edit Profil'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () => Get.to(() => EditProfilePage()),
+            ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.gamepad, color: Colors.green),
@@ -54,7 +70,7 @@ class ProfilPage extends StatelessWidget {
             ),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.chat, color: Colors.orange),
+              leading: const Icon(Icons.chat, color: Colors.pink),
               title: const Text('Asisten AI (Chatbot)'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () => Get.to(() => ChatbotPage()),

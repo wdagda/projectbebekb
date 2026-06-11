@@ -13,7 +13,7 @@ class DashboardPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Smart Duck Farm', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.pink,
         foregroundColor: Colors.white,
       ),
       body: RefreshIndicator(
@@ -74,7 +74,7 @@ class DashboardPage extends StatelessWidget {
                     title: 'Populasi Bebek',
                     value: controller.totalBebek,
                     icon: Icons.pets,
-                    color: Colors.orange,
+                    color: Colors.pink,
                   ),
                   _buildSummaryCard(
                     title: 'Produksi Hari Ini',

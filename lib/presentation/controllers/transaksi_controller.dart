@@ -1,14 +1,21 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../data/datasources/local_db.dart';
 
 class TransaksiController extends GetxController {
   var produkList = <Map<String, dynamic>>[].obs;
   var isLoading = false.obs;
+  
+  final _storage = GetStorage();
+  var stokPakan = 0.obs;
+  var lastPakanUpdate = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchProduk();
+    stokPakan.value = _storage.read('stokPakan') ?? 0;
+    lastPakanUpdate.value = _storage.read('lastPakanUpdate') ?? 'Belum ada data';
   }
 
   Future<void> fetchProduk() async {
@@ -88,6 +95,22 @@ class TransaksiController extends GetxController {
     fetchProduk();
     Get.back(); // tutup dialog
     Get.snackbar("Sukses", "$rawQty Telur Mentah menjadi $targetQty $targetProdukName");
+  }
+
+  void updatePakan(int diff) {
+    if (stokPakan.value + diff < 0) {
+      Get.snackbar('Gagal', 'Stok pakan tidak bisa minus');
+      return;
+    }
+    stokPakan.value += diff;
+    _storage.write('stokPakan', stokPakan.value);
+    
+    // Simpan tanggal
+    String now = DateTime.now().toIso8601String().split('T')[0];
+    lastPakanUpdate.value = now;
+    _storage.write('lastPakanUpdate', now);
+    
+    Get.snackbar('Berhasil', diff > 0 ? 'Pakan ditambahkan' : 'Pakan dikurangi');
   }
 
   Future<void> tambahStok(int produkId, int jumlahTambah) async {

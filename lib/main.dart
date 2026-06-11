@@ -20,9 +20,15 @@ class SmartDuckFarmApp extends StatelessWidget {
       title: 'Smart Duck Farm',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.orange,
+        primarySwatch: Colors.pink,
+        primaryColor: Colors.pink,
+        scaffoldBackgroundColor: const Color(0xFFFFF0F5), // LavenderBlush (light pink)
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.pinkAccent,
+          elevation: 0,
+        ),
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        fontFamily: 'Inter', // Bisa ditambahkan font family nanti
+        fontFamily: 'Inter',
       ),
       initialRoute: AppRoutes.LOGIN,
       getPages: AppPages.pages,

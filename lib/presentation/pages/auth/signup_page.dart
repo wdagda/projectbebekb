@@ -33,7 +33,7 @@ class SignupPage extends StatelessWidget {
                 const Icon(
                   Icons.person_add,
                   size: 80,
-                  color: Colors.orange,
+                  color: Colors.pink,
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -123,7 +123,7 @@ class SignupPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    backgroundColor: Colors.orange,
+                    backgroundColor: Colors.pink,
                     foregroundColor: Colors.white,
                   ),
                   child: _authController.isLoading.value

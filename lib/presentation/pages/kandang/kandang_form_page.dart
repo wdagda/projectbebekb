@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../controllers/kandang_controller.dart';
 import '../../../data/models/kandang_model.dart';
+import 'map_picker_page.dart';
 
 class KandangFormPage extends StatelessWidget {
   KandangFormPage({Key? key}) : super(key: key);
@@ -54,8 +55,27 @@ class KandangFormPage extends StatelessWidget {
                     lng.value = pos.longitude.toString();
                   }
                 },
-                icon: const Icon(Icons.location_on),
+                icon: const Icon(Icons.my_location),
                 label: const Text('Dapatkan Lokasi Saat Ini'),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () async {
+                  double initLat = lat.value.isEmpty ? -7.98 : double.parse(lat.value);
+                  double initLng = lng.value.isEmpty ? 112.63 : double.parse(lng.value);
+                  
+                  final result = await Get.to(() => MapPickerPage(
+                    initialLat: initLat,
+                    initialLng: initLng,
+                  ));
+                  
+                  if (result != null) {
+                    lat.value = result.latitude.toString();
+                    lng.value = result.longitude.toString();
+                  }
+                },
+                icon: const Icon(Icons.map),
+                label: const Text('Pilih Lokasi dari Peta (Drop Pin)'),
               ),
               const SizedBox(height: 32),
               ElevatedButton(
@@ -76,7 +96,7 @@ class KandangFormPage extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Colors.pink,
                 ),
                 child: const Text('Simpan', style: TextStyle(color: Colors.white, fontSize: 16)),
               )

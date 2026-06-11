@@ -24,7 +24,7 @@ class LoginPage extends StatelessWidget {
                 const Icon(
                   Icons.pets,
                   size: 80,
-                  color: Colors.orange,
+                  color: Colors.pink,
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -89,7 +89,7 @@ class LoginPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    backgroundColor: Colors.orange,
+                    backgroundColor: Colors.pink,
                     foregroundColor: Colors.white,
                   ),
                   child: _authController.isLoading.value

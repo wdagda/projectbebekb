@@ -33,7 +33,7 @@ class GameCatchEggPage extends StatelessWidget {
             // Telur
             Align(
               alignment: Alignment(controller.eggX.value, controller.eggY.value),
-              child: const Icon(Icons.egg, size: 40, color: Colors.orange),
+              child: const Icon(Icons.egg, size: 40, color: Colors.pink),
             ),
             // Keranjang
             Align(

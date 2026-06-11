@@ -29,7 +29,7 @@ class MainPage extends StatelessWidget {
         currentIndex: controller.currentIndex.value,
         onTap: controller.changePage,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.orange,
+        selectedItemColor: Colors.pink,
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Beranda'),

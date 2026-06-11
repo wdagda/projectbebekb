@@ -14,7 +14,7 @@ class StokPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Manajemen Stok'),
-          backgroundColor: Colors.orange,
+          backgroundColor: Colors.pink,
           foregroundColor: Colors.white,
           bottom: const TabBar(
             indicatorColor: Colors.white,
@@ -29,7 +29,7 @@ class StokPage extends StatelessWidget {
         body: TabBarView(
           children: [
             _buildProdukTab(context),
-            const Center(child: Text('Fitur Stok Pakan (Segera hadir)')),
+            _buildPakanTab(context),
           ],
         ),
       ),
@@ -152,6 +152,63 @@ class StokPage extends StatelessWidget {
           controller.konversiProduk(int.parse(qtyCtrl.text), target);
         }
       }
+    );
+  }
+
+  Widget _buildPakanTab(BuildContext context) {
+    final TextEditingController pakanCtrl = TextEditingController();
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.grass, size: 80, color: Colors.green),
+          const SizedBox(height: 16),
+          const Text('Stok Pakan Saat Ini', style: TextStyle(fontSize: 18, color: Colors.grey)),
+          Obx(() => Text('${controller.stokPakan.value} Kg', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold))),
+          Obx(() => Text('Terakhir Update: ${controller.lastPakanUpdate.value}', style: const TextStyle(fontSize: 14, color: Colors.blue))),
+          const SizedBox(height: 32),
+          TextField(
+            controller: pakanCtrl,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Jumlah (Kg)',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.scale),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {
+                  if (pakanCtrl.text.isNotEmpty) {
+                    controller.updatePakan(-int.parse(pakanCtrl.text));
+                    pakanCtrl.clear();
+                  }
+                },
+                icon: const Icon(Icons.remove),
+                label: const Text('Kurangi'),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  if (pakanCtrl.text.isNotEmpty) {
+                    controller.updatePakan(int.parse(pakanCtrl.text));
+                    pakanCtrl.clear();
+                  }
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Tambah'),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Text('Masukkan jumlah pakan di kolom atas, lalu tekan Tambah atau Kurangi.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12)),
+        ],
+      ),
     );
   }
 }

@@ -14,7 +14,7 @@ class KandangPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Manajemen Kandang'),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.pink,
         foregroundColor: Colors.white,
       ),
       body: Obx(() {
@@ -35,7 +35,7 @@ class KandangPage extends StatelessWidget {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 leading: const CircleAvatar(
-                  backgroundColor: Colors.orange,
+                  backgroundColor: Colors.pink,
                   child: Icon(Icons.home_work, color: Colors.white),
                 ),
                 title: Text(kandang.namaKandang, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -62,7 +62,7 @@ class KandangPage extends StatelessWidget {
       }),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Get.to(() => KandangFormPage()),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.pink,
         icon: const Icon(Icons.add, color: Colors.white),
         label: const Text('Tambah', style: TextStyle(color: Colors.white)),
       ),

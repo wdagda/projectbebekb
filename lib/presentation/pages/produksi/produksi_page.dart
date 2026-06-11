@@ -13,7 +13,7 @@ class ProduksiPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Input Produksi Telur'),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.pink,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -57,7 +57,7 @@ class ProduksiPage extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.pink,
               ),
               child: controller.isLoading.value 
                 ? const CircularProgressIndicator(color: Colors.white)

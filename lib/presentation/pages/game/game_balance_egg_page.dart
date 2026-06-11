@@ -47,7 +47,7 @@ class GameBalanceEggPage extends StatelessWidget {
                     child: child,
                   );
                 },
-                child: const Icon(Icons.egg, size: 100, color: Colors.orange),
+                child: const Icon(Icons.egg, size: 100, color: Colors.pink),
               ),
               const SizedBox(height: 32),
               const Text('Awas jangan sampai goyang!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
