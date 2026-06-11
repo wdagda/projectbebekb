@@ -16,9 +16,40 @@ class LocalDB {
     
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  static Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Recreate Bebek and StokPakan with new schema
+      await db.execute('DROP TABLE IF EXISTS Bebek');
+      await db.execute('DROP TABLE IF EXISTS StokPakan');
+
+      await db.execute('''
+        CREATE TABLE Bebek(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          kandang_id INTEGER,
+          jenis_mutasi TEXT, -- 'Masuk', 'Keluar', 'Mati'
+          jumlah_bebek INTEGER,
+          tanggal_input TEXT,
+          keterangan TEXT,
+          FOREIGN KEY (kandang_id) REFERENCES Kandang (id) ON DELETE CASCADE
+        )
+      ''');
+
+      await db.execute('''
+        CREATE TABLE StokPakan(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          tanggal TEXT,
+          jenis_mutasi TEXT, -- 'Masuk', 'Keluar'
+          jumlah INTEGER,
+          keterangan TEXT
+        )
+      ''');
+    }
   }
 
   static Future _onCreate(Database db, int version) async {
@@ -45,13 +76,15 @@ class LocalDB {
       )
     ''');
 
-    // 3. Tabel Bebek
+    // 3. Tabel Bebek (Skema Baru)
     await db.execute('''
       CREATE TABLE Bebek(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         kandang_id INTEGER,
+        jenis_mutasi TEXT,
         jumlah_bebek INTEGER,
         tanggal_input TEXT,
+        keterangan TEXT,
         FOREIGN KEY (kandang_id) REFERENCES Kandang (id) ON DELETE CASCADE
       )
     ''');
@@ -67,15 +100,14 @@ class LocalDB {
       )
     ''');
 
-    // 5. Tabel StokPakan
+    // 5. Tabel StokPakan (Skema Baru)
     await db.execute('''
       CREATE TABLE StokPakan(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         tanggal TEXT,
-        stok_awal INTEGER,
-        stok_masuk INTEGER,
-        stok_keluar INTEGER,
-        stok_akhir INTEGER
+        jenis_mutasi TEXT,
+        jumlah INTEGER,
+        keterangan TEXT
       )
     ''');
 

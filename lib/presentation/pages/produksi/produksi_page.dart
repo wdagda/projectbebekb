@@ -16,9 +16,14 @@ class ProduksiPage extends StatelessWidget {
         backgroundColor: Colors.pink,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await controller.fetchKandang();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(16),
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text('Pilih Kandang Asal:', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -73,6 +78,7 @@ class ProduksiPage extends StatelessWidget {
             )
           ],
         ),
+      ),
       ),
     );
   }

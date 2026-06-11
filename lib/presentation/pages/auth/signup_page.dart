@@ -111,6 +111,11 @@ class SignupPage extends StatelessWidget {
                   onPressed: _authController.isLoading.value 
                     ? null 
                     : () {
+                        if (!GetUtils.isEmail(_emailController.text)) {
+                          Get.snackbar('Error', 'Format email tidak valid', 
+                            backgroundColor: Colors.red, colorText: Colors.white);
+                          return;
+                        }
                         _authController.signup(
                           _namaController.text, 
                           _emailController.text,

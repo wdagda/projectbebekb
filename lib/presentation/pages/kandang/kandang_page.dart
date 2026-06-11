@@ -4,6 +4,8 @@ import '../../controllers/kandang_controller.dart';
 import 'kandang_form_page.dart';
 import 'kandang_map_page.dart';
 
+import 'riwayat_populasi_page.dart';
+
 class KandangPage extends StatelessWidget {
   KandangPage({Key? key}) : super(key: key);
 
@@ -44,13 +46,22 @@ class KandangPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
+                      icon: const Icon(Icons.pets, color: Colors.orange),
+                      tooltip: 'Populasi Bebek',
+                      onPressed: () {
+                        Get.to(() => RiwayatPopulasiPage(kandang: kandang));
+                      },
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.map, color: Colors.blue),
+                      tooltip: 'Peta Kandang',
                       onPressed: () {
                         Get.to(() => KandangMapPage(kandang: kandang));
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
+                      tooltip: 'Hapus Kandang',
                       onPressed: () => controller.deleteKandang(kandang.id!),
                     ),
                   ],

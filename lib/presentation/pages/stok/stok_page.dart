@@ -56,13 +56,13 @@ class StokPage extends StatelessWidget {
                 onSelected: (val) {
                   if (val == 'tambah') _showTambahDialog(context, produk);
                   if (val == 'jual') _showJualDialog(context, produk);
-                  if (val == 'konversi') _showKonversiDialog(context);
+                  if (val == 'konversi') _showKonversiDialog(context, produk);
                 },
                 itemBuilder: (context) {
                   List<PopupMenuEntry<String>> items = [];
                   items.add(const PopupMenuItem(value: 'tambah', child: Text('Tambah Stok')));
                   items.add(const PopupMenuItem(value: 'jual', child: Text('Jual / Keluar')));
-                  if (produk['nama_produk'] == 'Telur Bebek Mentah') {
+                  if (produk['nama_produk'] == 'Telur Bebek Mentah' || produk['nama_produk'] == 'Telur Asin') {
                     items.add(const PopupMenuItem(value: 'konversi', child: Text('Konversi Produk')));
                   }
                   return items;
@@ -117,11 +117,13 @@ class StokPage extends StatelessWidget {
     );
   }
 
-  void _showKonversiDialog(BuildContext context) {
+  void _showKonversiDialog(BuildContext context, Map produk) {
     final qtyCtrl = TextEditingController();
-    String target = 'Telur Asin';
+    bool isMentah = produk['nama_produk'] == 'Telur Bebek Mentah';
+    String target = isMentah ? 'Telur Asin' : 'Kerupuk Telur Asin';
+    
     Get.defaultDialog(
-      title: 'Konversi Mentah',
+      title: 'Konversi ${produk['nama_produk']}',
       content: StatefulBuilder(
         builder: (context, setState) {
           return Column(
@@ -129,14 +131,14 @@ class StokPage extends StatelessWidget {
               TextField(
                 controller: qtyCtrl,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Jumlah Mentah', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'Jumlah ${produk['nama_produk']}', border: const OutlineInputBorder()),
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: target,
-                items: const [
-                  DropdownMenuItem(value: 'Telur Asin', child: Text('Ke Telur Asin')),
-                  DropdownMenuItem(value: 'Kerupuk Telur Asin', child: Text('Ke Kerupuk Telur Asin')),
+                items: [
+                  if (isMentah) const DropdownMenuItem(value: 'Telur Asin', child: Text('Ke Telur Asin')),
+                  if (!isMentah) const DropdownMenuItem(value: 'Kerupuk Telur Asin', child: Text('Ke Kerupuk Telur Asin')),
                 ],
                 onChanged: (v) => setState(() => target = v!),
               )
@@ -149,7 +151,7 @@ class StokPage extends StatelessWidget {
       confirmTextColor: Colors.white,
       onConfirm: () {
         if (qtyCtrl.text.isNotEmpty) {
-          controller.konversiProduk(int.parse(qtyCtrl.text), target);
+          controller.konversiProduk(produk['nama_produk'], int.parse(qtyCtrl.text), target);
         }
       }
     );
@@ -207,6 +209,43 @@ class StokPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Text('Masukkan jumlah pakan di kolom atas, lalu tekan Tambah atau Kurangi.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12)),
+          const SizedBox(height: 24),
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text('Riwayat Transaksi Pakan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: Obx(() {
+              if (controller.riwayatPakan.isEmpty) {
+                return const Center(child: Text('Belum ada riwayat pakan.'));
+              }
+              return ListView.builder(
+                itemCount: controller.riwayatPakan.length,
+                itemBuilder: (context, index) {
+                  final data = controller.riwayatPakan[index];
+                  bool isMasuk = data['jenis_mutasi'] == 'Masuk';
+                  return Card(
+                    child: ListTile(
+                      leading: Icon(
+                        isMasuk ? Icons.arrow_downward : Icons.arrow_upward,
+                        color: isMasuk ? Colors.green : Colors.red,
+                      ),
+                      title: Text(data['keterangan'] ?? '-'),
+                      subtitle: Text(data['tanggal'].toString().split('T').join(' ').substring(0, 16)),
+                      trailing: Text(
+                        '${data['jumlah']} Kg',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isMasuk ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            }),
+          ),
         ],
       ),
     );

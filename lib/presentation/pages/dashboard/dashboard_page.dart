@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/dashboard_controller.dart';
+import '../ai/ai_page.dart';
 
 class DashboardPage extends StatelessWidget {
   DashboardPage({Key? key}) : super(key: key);
@@ -15,6 +16,17 @@ class DashboardPage extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.pink,
         foregroundColor: Colors.white,
+        actions: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Obx(() => Text(
+                controller.currentTimeWIB.value,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              )),
+            ),
+          )
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -87,7 +99,7 @@ class DashboardPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: InkWell(
                       onTap: () {
-                        // TODO: Pindah ke tab produksi AI Prediksi
+                        Get.to(() => AiPage());
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -105,6 +117,43 @@ class DashboardPage extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 24),
+
+              // Preview Kandang
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Preview Kandang', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  TextButton(
+                    onPressed: () {
+                      // Ini bisa dihubungkan ke navigasi tab Kandang di MainPage jika diperlukan.
+                    },
+                    child: const Text('Lihat Semua'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Obx(() {
+                if (controller.previewKandang.isEmpty) {
+                  return const Text('Belum ada data kandang.');
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.previewKandang.length,
+                  itemBuilder: (context, index) {
+                    final k = controller.previewKandang[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: const Icon(Icons.home_work, color: Colors.brown),
+                        title: Text(k['nama_kandang'] ?? 'Kandang'),
+                        subtitle: Text('Populasi: ${k['populasi'] ?? 0} Ekor'),
+                      ),
+                    );
+                  },
+                );
+              }),
             ],
           ),
         ),

@@ -10,12 +10,29 @@ class TransaksiController extends GetxController {
   var stokPakan = 0.obs;
   var lastPakanUpdate = ''.obs;
 
+  var riwayatPakan = <Map<String, dynamic>>[].obs;
+
   @override
   void onInit() {
     super.onInit();
     fetchProduk();
-    stokPakan.value = _storage.read('stokPakan') ?? 0;
-    lastPakanUpdate.value = _storage.read('lastPakanUpdate') ?? 'Belum ada data';
+    fetchPakan();
+  }
+
+  Future<void> fetchPakan() async {
+    final db = await LocalDB.database;
+    final List<Map<String, dynamic>> maps = await db.query('StokPakan', orderBy: 'id DESC');
+    riwayatPakan.value = maps;
+
+    // Hitung total stok
+    var result = await db.rawQuery('SELECT SUM(jumlah) as total FROM StokPakan');
+    stokPakan.value = (result.first['total'] as int?) ?? 0;
+    
+    if (maps.isNotEmpty) {
+      lastPakanUpdate.value = maps.first['tanggal'].toString().split('T')[0];
+    } else {
+      lastPakanUpdate.value = 'Belum ada data';
+    }
   }
 
   Future<void> fetchProduk() async {
@@ -58,33 +75,35 @@ class TransaksiController extends GetxController {
     Get.snackbar("Sukses", "Penjualan berhasil, stok terpotong");
   }
 
-  Future<void> konversiProduk(int rawQty, String targetProdukName) async {
+  Future<void> konversiProduk(String sourceProdukName, int rawQty, String targetProdukName) async {
     final db = await LocalDB.database;
 
-    // Asumsi ID 1 adalah Telur Mentah
-    var mentah = produkList.firstWhere((p) => p['nama_produk'] == 'Telur Bebek Mentah');
-    if (mentah['stok'] < rawQty) {
-      Get.snackbar('Gagal', 'Stok telur mentah kurang');
+    var sourceProduct = produkList.firstWhere((p) => p['nama_produk'] == sourceProdukName);
+    if (sourceProduct['stok'] < rawQty) {
+      Get.snackbar('Gagal', 'Stok $sourceProdukName kurang');
       return;
     }
 
     int targetQty = 0;
-    if (targetProdukName == 'Telur Asin') {
+    if (sourceProdukName == 'Telur Bebek Mentah' && targetProdukName == 'Telur Asin') {
       targetQty = rawQty; // 1 mentah = 1 asin
-    } else if (targetProdukName == 'Kerupuk Telur Asin') {
-      targetQty = (rawQty / 2).floor(); // Asumsi 2 telur = 1 bks kerupuk
+    } else if (sourceProdukName == 'Telur Asin' && targetProdukName == 'Kerupuk Telur Asin') {
+      targetQty = (rawQty / 2).floor(); // Asumsi 2 telur asin = 1 bks kerupuk
+    } else {
+      Get.snackbar('Gagal', 'Konversi dari $sourceProdukName ke $targetProdukName tidak didukung');
+      return;
     }
 
     await db.transaction((txn) async {
-      // Potong stok mentah
-      await txn.rawUpdate("UPDATE Produk SET stok = stok - ? WHERE nama_produk = 'Telur Bebek Mentah'", [rawQty]);
+      // Potong stok sumber
+      await txn.rawUpdate("UPDATE Produk SET stok = stok - ? WHERE nama_produk = ?", [rawQty, sourceProdukName]);
       
       // Tambah stok target
       await txn.rawUpdate("UPDATE Produk SET stok = stok + ? WHERE nama_produk = ?", [targetQty, targetProdukName]);
       
       // Log Konversi
       await txn.insert('RiwayatTransaksi', {
-        'produk_id': mentah['id'],
+        'produk_id': sourceProduct['id'],
         'tanggal': DateTime.now().toIso8601String(),
         'jenis_transaksi': 'Konversi',
         'jumlah_perubahan': -rawQty,
@@ -94,22 +113,24 @@ class TransaksiController extends GetxController {
 
     fetchProduk();
     Get.back(); // tutup dialog
-    Get.snackbar("Sukses", "$rawQty Telur Mentah menjadi $targetQty $targetProdukName");
+    Get.snackbar("Sukses", "$rawQty $sourceProdukName menjadi $targetQty $targetProdukName");
   }
 
-  void updatePakan(int diff) {
+  Future<void> updatePakan(int diff) async {
     if (stokPakan.value + diff < 0) {
       Get.snackbar('Gagal', 'Stok pakan tidak bisa minus');
       return;
     }
-    stokPakan.value += diff;
-    _storage.write('stokPakan', stokPakan.value);
     
-    // Simpan tanggal
-    String now = DateTime.now().toIso8601String().split('T')[0];
-    lastPakanUpdate.value = now;
-    _storage.write('lastPakanUpdate', now);
+    final db = await LocalDB.database;
+    await db.insert('StokPakan', {
+      'tanggal': DateTime.now().toIso8601String(),
+      'jenis_mutasi': diff > 0 ? 'Masuk' : 'Keluar',
+      'jumlah': diff, // Menyimpan nilai plus atau minus
+      'keterangan': diff > 0 ? 'Penambahan pakan' : 'Konsumsi pakan harian'
+    });
     
+    fetchPakan();
     Get.snackbar('Berhasil', diff > 0 ? 'Pakan ditambahkan' : 'Pakan dikurangi');
   }
 

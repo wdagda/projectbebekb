@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
+import 'package:geolocator/geolocator.dart';
 
 class MapPickerPage extends StatefulWidget {
   final double initialLat;
@@ -14,11 +15,58 @@ class MapPickerPage extends StatefulWidget {
 
 class _MapPickerPageState extends State<MapPickerPage> {
   LatLng? _currentCenter;
+  GoogleMapController? _mapController;
+  bool _isLoadingLocation = true;
 
   @override
   void initState() {
     super.initState();
     _currentCenter = LatLng(widget.initialLat, widget.initialLng);
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        Get.snackbar('Informasi', 'Service lokasi (GPS) tidak aktif.');
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          Get.snackbar('Error', 'Izin lokasi ditolak.');
+          return;
+        }
+      }
+      
+      if (permission == LocationPermission.deniedForever) {
+        Get.snackbar('Error', 'Izin lokasi diblokir secara permanen. Silakan ubah dari pengaturan.');
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high
+      );
+
+      setState(() {
+        _currentCenter = LatLng(position.latitude, position.longitude);
+      });
+
+      _mapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: _currentCenter!, zoom: 15)
+        )
+      );
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal mendapatkan lokasi saat ini: $e');
+    } finally {
+      setState(() {
+        _isLoadingLocation = false;
+      });
+    }
   }
 
   @override
@@ -34,16 +82,44 @@ class _MapPickerPageState extends State<MapPickerPage> {
               target: LatLng(widget.initialLat, widget.initialLng),
               zoom: 15,
             ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            onMapCreated: (controller) {
+              _mapController = controller;
+              if (_currentCenter != null) {
+                 _mapController?.animateCamera(
+                    CameraUpdate.newCameraPosition(
+                      CameraPosition(target: _currentCenter!, zoom: 15)
+                    )
+                 );
+              }
+            },
             onCameraMove: (CameraPosition position) {
               _currentCenter = position.target;
             },
           ),
           const Center(
             child: Padding(
-              padding: EdgeInsets.only(bottom: 32.0), // Geser sedikit ke atas agar pas di tengah
+              padding: EdgeInsets.only(bottom: 32.0),
               child: Icon(Icons.location_on, size: 48, color: Colors.pink),
             ),
           ),
+          if (_isLoadingLocation)
+            const Center(
+              child: Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Mencari lokasi Anda...'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

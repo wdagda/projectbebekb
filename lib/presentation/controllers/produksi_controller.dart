@@ -13,6 +13,12 @@ class ProduksiController extends GetxController {
     fetchKandang();
   }
 
+  @override
+  void onReady() {
+    super.onReady();
+    fetchKandang();
+  }
+
   Future<void> fetchKandang() async {
     final db = await LocalDB.database;
     final List<Map<String, dynamic>> maps = await db.query('Kandang');
